@@ -21,8 +21,14 @@ module PolynomialComputations
           j -= 1
           @tokens.push(Token.new(TokenType::NUMBER, Float(@input[i..j])))
           i = j
-        when /[+\-*\/^]/
-          @tokens.push(Token.new(TokenType::OPERATION, char))
+        when '+'
+          @tokens.push(Token.new(TokenType::PLUS, char))
+        when '-'
+          @tokens.push(Token.new(TokenType::PLUS, char))
+        when '*'
+          @tokens.push(Token.new(TokenType::PLUS, char))
+        when '/'
+          @tokens.push(Token.new(TokenType::PLUS, char))
         when '('
           @tokens.push(Token.new(TokenType::LPAR, char))
         when ')'
@@ -39,6 +45,7 @@ module PolynomialComputations
   end
 
   class Token
+    attr_accessor :type, :value
     def initialize(type, value)
       @type = type
       @value = value
@@ -48,8 +55,11 @@ module PolynomialComputations
   module TokenType
     NUMBER = 0
     VAR = 1
-    OPERATION = 2
-    LPAR = 3
-    RPAR = 4
+    PLUS = 2
+    MINUS = 3
+    DIVIDE = 4
+    MULTIPLY = 5
+    LPAR = 6
+    RPAR = 7
   end
 end
