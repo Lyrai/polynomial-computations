@@ -24,11 +24,11 @@ module PolynomialComputations
         when '+'
           tokens.push(Token.new(TokenType::PLUS, char))
         when '-'
-          tokens.push(Token.new(TokenType::PLUS, char))
+          tokens.push(Token.new(TokenType::MINUS, char))
         when '*'
-          tokens.push(Token.new(TokenType::PLUS, char))
+          tokens.push(Token.new(TokenType::MULTIPLY, char))
         when '/'
-          tokens.push(Token.new(TokenType::PLUS, char))
+          tokens.push(Token.new(TokenType::DIVIDE, char))
         when '('
           tokens.push(Token.new(TokenType::LPAR, char))
         when ')'
