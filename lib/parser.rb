@@ -3,16 +3,17 @@ module PolynomialComputations
   expression: term ((+|-) term)*
   term: factor ((*|/) factor)*
   factor: ((+|-) factor) | power
-  power: primary (^ primary)*
+  power: primary (^ power)?
   primary: var | num | '(' expression ')'
   var: [a-z]
   num [0-9]+(.[0-9]*)
 =end
 
   class Parser
+    attr_accessor :tokens
     def initialize(tokens)
       @tokens = tokens
-      position = 0
+      @pos = 0
     end
 
     def parse
@@ -20,27 +21,32 @@ module PolynomialComputations
     end
 
     def expression
+      p "Expression"
       node = term
-      op = match [TokenType::PLUS, TokenType::MINUS]
+      op = match_token [TokenType::PLUS, TokenType::MINUS]
       until op.nil?
         node = BinOpNode.new(op, left: node, right: term)
+        op = match_token [TokenType::PLUS, TokenType::MINUS]
       end
 
       node
     end
 
     def term
+      p "Term"
       node = factor
-      op = match [TokenType::MULTIPLY, TokenType::DIVIDE]
+      op = match_token [TokenType::MULTIPLY, TokenType::DIVIDE]
       until op.nil?
         node = BinOpNode.new(op, left: node, right: factor)
+        op = match_token [TokenType::MULTIPLY, TokenType::DIVIDE]
       end
 
       node
     end
 
     def factor
-      unary = match [TokenType::MINUS, TokenType::PLUS]
+      p "Factor"
+      unary = match_token [TokenType::MINUS, TokenType::PLUS]
       unless unary.nil?
         return UnOpNode.new(unary, factor)
       end
@@ -49,14 +55,47 @@ module PolynomialComputations
     end
 
     def power
+      p "Power"
+      base = primary
+      exp_token = match_token [TokenType::POWER]
+      unless exp_token.nil?
+        base = BinOpNode.new(exp_token, left: base, right: power)
+        op = match_token [TokenType::POWER]
+      end
 
+      base
     end
 
-    def match(types)
+    def primary
+      p "Primary"
+      token = match_token [TokenType::LPAR, TokenType::VAR, TokenType::NUMBER]
+      if token.nil?
+        raise StandardError.new("Unexpected token " + @tokens[@pos].value)
+      end
+
+      if token.type == TokenType::LPAR
+        node = expression
+        if match_token([TokenType::RPAR]).nil?
+          raise StandardError.new("Expected ) at the end of the expression")
+        end
+
+        node
+      elsif token.type == TokenType::VAR
+        VarNode.new(token)
+      elsif token.type == TokenType::NUMBER
+        NumberNode.new(token)
+      end
+    end
+
+    def match_token(types)
+      if @pos >= @tokens.size
+        return nil
+      end
+
       types.each do |type|
-        if @tokens[pos].type == type
-          pos += 1
-          return @tokens[pos - 1]
+        if @tokens[@pos].type == type
+          @pos += 1
+          return @tokens[@pos - 1]
         end
       end
 
@@ -88,6 +127,24 @@ module PolynomialComputations
     def initialize(token, operand)
       super token
       @operand = operand
+    end
+  end
+
+  class VarNode < Node
+    attr_accessor :name
+
+    def initialize(token)
+      super token
+      @name = token.value
+    end
+  end
+
+  class NumberNode < Node
+    attr_accessor :value
+
+    def initialize(token)
+      super token
+      @value = Float(token.value)
     end
   end
 end
