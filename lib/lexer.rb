@@ -18,6 +18,12 @@ module PolynomialComputations
           while ('0'..'9').include?(@input[j])
             j += 1
           end
+          if @input[j] == '.'
+            j += 1
+          end
+          while ('0'..'9').include?(@input[j])
+            j += 1
+          end
           j -= 1
           tokens.push(Token.new(TokenType::NUMBER, Float(@input[i..j])))
           i = j
