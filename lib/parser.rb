@@ -126,7 +126,7 @@ module PolynomialComputations
   end
 
   class Node
-    attr_accessor :token, :value, :parent
+    attr_accessor :parent
     def initialize(token)
       @token = token
       @value = token.value
@@ -135,6 +135,19 @@ module PolynomialComputations
 
     def set_parent(parent)
       @parent = parent
+    end
+
+    def value
+      @value
+    end
+
+    def token
+      @token
+    end
+
+    def set_token(token)
+      @token = token
+      @value = token.value
     end
   end
 
@@ -150,6 +163,12 @@ module PolynomialComputations
     def accept(visitor)
       visitor.visit_bin_op_node self
     end
+
+    def print(depth = 0)
+      puts " " * depth + "BinOp: " + @value
+      @left.print depth + 1
+      @right.print depth + 1
+    end
   end
 
   class UnOpNode < Node
@@ -162,6 +181,11 @@ module PolynomialComputations
 
     def accept(visitor)
       visitor.visit_un_op_node self
+    end
+
+    def print(depth = 0)
+      puts " " * depth + "UnOp: " + @value
+      @operand.print depth + 1
     end
   end
 
@@ -176,6 +200,10 @@ module PolynomialComputations
     def accept(visitor)
       visitor.visit_var_node self
     end
+
+    def print(depth = 0)
+      puts " " * depth + "Var: " + @value
+    end
   end
 
   class NumberNode < Node
@@ -188,6 +216,10 @@ module PolynomialComputations
 
     def accept(visitor)
       visitor.visit_number_node self
+    end
+
+    def print(depth = 0)
+      puts " " * depth + "Number: " + @value.to_s
     end
   end
 end
