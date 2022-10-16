@@ -2,7 +2,7 @@ module PolynomialComputations
 =begin
   expression: term ((+|-) term)*
   term: factor ((*|/) factor)*
-  factor: ((+|-) factor) | power
+  factor: (- factor) | power
   power: primary (^ num)?
   primary: var | num | '(' expression ')'
   var: [a-z]
@@ -53,10 +53,11 @@ module PolynomialComputations
     end
 
     def factor(parent)
-      unary = match_token [TokenType::MINUS, TokenType::PLUS]
+      unary = match_token [TokenType::MINUS]
       unless unary.nil?
         inner = factor parent
-        new_node = UnOpNode.new(unary, inner)
+        new_node = BinOpNode.new(Token.new(TokenType::MULTIPLY, '*'), left: NumberNode.new(Token.new(TokenType::NUMBER, -1.0)), right: inner)
+        new_node.parent = new_node
         inner.set_parent new_node
         return new_node
       end
