@@ -13,10 +13,6 @@ module PolynomialComputations
 
     end
 
-    def visit_un_op_node(node)
-
-    end
-
     def visit_var_node(node)
 
     end
