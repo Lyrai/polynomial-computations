@@ -2,7 +2,7 @@ module PolynomialComputations
 =begin
   expression: term ((+|-) term)*
   term: factor ((*|/) factor)*
-  factor: ((+|-) factor) | power
+  factor: (- factor) | power
   power: primary (^ num)?
   primary: var | num | '(' expression ')'
   var: [a-z]
@@ -26,9 +26,9 @@ module PolynomialComputations
       until op.nil?
         right = term parent
         new_node = BinOpNode.new(op, left: node, right: right)
-        node.set_parent new_node
-        right.set_parent new_node
-        new_node.set_parent parent
+        node.set_parent! new_node
+        right.set_parent! new_node
+        new_node.set_parent! parent
         node = new_node
         op = match_token [TokenType::PLUS, TokenType::MINUS]
       end
@@ -42,9 +42,9 @@ module PolynomialComputations
       until op.nil?
         right = factor parent
         new_node = BinOpNode.new(op, left: node, right: right)
-        node.set_parent new_node
-        right.set_parent new_node
-        new_node.set_parent parent
+        node.set_parent! new_node
+        right.set_parent! new_node
+        new_node.set_parent! parent
         node = new_node
         op = match_token [TokenType::MULTIPLY, TokenType::DIVIDE]
       end
@@ -53,11 +53,12 @@ module PolynomialComputations
     end
 
     def factor(parent)
-      unary = match_token [TokenType::MINUS, TokenType::PLUS]
+      unary = match_token [TokenType::MINUS]
       unless unary.nil?
         inner = factor parent
-        new_node = UnOpNode.new(unary, inner)
-        inner.set_parent new_node
+        new_node = BinOpNode.new(Token.new(TokenType::MULTIPLY, '*'), left: NumberNode.new(Token.new(TokenType::NUMBER, -1.0)), right: inner)
+        new_node.parent = new_node
+        inner.set_parent! new_node
         return new_node
       end
 
@@ -69,15 +70,15 @@ module PolynomialComputations
       exp_token = match_token [TokenType::POWER]
       unless exp_token.nil?
         num_token = match_token [TokenType::NUMBER]
-        unless num_token.nil?
-          raise StandardError.new "Unexpected token"
+        if num_token.nil?
+          raise StandardError.new("Unexpected token " + @tokens[@pos].value)
         end
 
         right = NumberNode.new(num_token)
         new_node = BinOpNode.new(exp_token, left: base, right: right)
-        base.set_parent new_node
-        right.set_parent new_node
-        new_node.set_parent parent
+        base.set_parent! new_node
+        right.set_parent! new_node
+        new_node.set_parent! parent
         base = new_node
       end
 
@@ -99,11 +100,11 @@ module PolynomialComputations
         node
       elsif token.type == TokenType::VAR
         node = VarNode.new(token)
-        node.set_parent parent
+        node.set_parent! parent
         node
       elsif token.type == TokenType::NUMBER
         node = NumberNode.new(token)
-        node.set_parent parent
+        node.set_parent! parent
         node
       end
     end
@@ -125,15 +126,28 @@ module PolynomialComputations
   end
 
   class Node
-    attr_accessor :token, :value, :parent
+    attr_accessor :parent
     def initialize(token)
       @token = token
       @value = token.value
       @parent = nil
     end
 
-    def set_parent(parent)
+    def set_parent!(parent)
       @parent = parent
+    end
+
+    def value
+      @value
+    end
+
+    def token
+      @token
+    end
+
+    def set_token!(token)
+      @token = token
+      @value = token.value
     end
   end
 
@@ -149,18 +163,19 @@ module PolynomialComputations
     def accept(visitor)
       visitor.visit_bin_op_node self
     end
-  end
 
-  class UnOpNode < Node
-    attr_accessor :operand
-
-    def initialize(token, operand)
-      super token
-      @operand = operand
+    def print(depth = 0)
+      puts " " * depth + "BinOp: " + @value
+      @left.print depth + 1
+      @right.print depth + 1
     end
 
-    def accept(visitor)
-      visitor.visit_un_op_node self
+    def replace!(old, new)
+      if @left.equal? old
+        @left = new
+      elsif @right.equal? old
+        @right = new
+      end
     end
   end
 
@@ -175,6 +190,10 @@ module PolynomialComputations
     def accept(visitor)
       visitor.visit_var_node self
     end
+
+    def print(depth = 0)
+      puts " " * depth + "Var: " + @value
+    end
   end
 
   class NumberNode < Node
@@ -187,6 +206,10 @@ module PolynomialComputations
 
     def accept(visitor)
       visitor.visit_number_node self
+    end
+
+    def print(depth = 0)
+      puts " " * depth + "Number: " + @value.to_s
     end
   end
 end
