@@ -37,8 +37,8 @@ module PolynomialComputations
               node.parent.replace! node, new_node
             end
           else
-            node.right.set_token! Token.new(TokenType::NUMBER, node.right.value * -1)
-            new_node = BinOpNode.new(Token.new(TokenType::DIVIDE, '/'), left: NumberNode.new(Token.new(TokenType::NUMBER, 1)), right: node)
+            node.right.set_token! Token.new(TokenType::NUMBER, node.right.value * -1)  # Change power sign to use this node as rhs for division
+            new_node = BinOpNode.new(Token.new(TokenType::DIVIDE, '/'), left: NumberNode.new(Token.new(TokenType::NUMBER, 1)), right: node)  # 1 / node
             if node.parent.nil?
               @tree = new_node
             else

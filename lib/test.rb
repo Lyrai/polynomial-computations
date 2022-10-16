@@ -3,6 +3,7 @@ require_relative 'parser'
 require_relative 'simplifier'
 require_relative 'constant_folder'
 require_relative 'power_expander'
+require_relative 'polynomial_composer'
 include PolynomialComputations
 
 puts "Enter expression: "
@@ -25,3 +26,8 @@ s = Simplifier.new tree
 tree = s.simplify
 puts "--------------------------"
 tree.print
+
+c = PolynomialComposer.new(tree)
+poly = c.compose
+puts "--------------------------"
+puts "Polynomial: " +  poly.to_s
