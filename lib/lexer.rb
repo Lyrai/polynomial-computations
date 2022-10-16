@@ -2,37 +2,45 @@ module PolynomialComputations
   class Lexer
     def initialize(str)
       @input = str
-      @tokens = []
     end
 
     def tokens
       i = 0
+      tokens = []
       while i < @input.size
 
         char = @input[i]
         case char
         when 'a'..'z'
-          @tokens.push(Token.new(TokenType::VAR, @input[i]))
+          tokens.push(Token.new(TokenType::VAR, @input[i]))
         when '0'..'9'
           j = i
           while ('0'..'9').include?(@input[j])
             j += 1
           end
+          if @input[j] == '.'
+            j += 1
+          end
+          while ('0'..'9').include?(@input[j])
+            j += 1
+          end
           j -= 1
-          @tokens.push(Token.new(TokenType::NUMBER, Float(@input[i..j])))
+          tokens.push(Token.new(TokenType::NUMBER, Float(@input[i..j])))
           i = j
         when '+'
-          @tokens.push(Token.new(TokenType::PLUS, char))
+          tokens.push(Token.new(TokenType::PLUS, char))
         when '-'
-          @tokens.push(Token.new(TokenType::PLUS, char))
+          tokens.push(Token.new(TokenType::MINUS, char))
         when '*'
-          @tokens.push(Token.new(TokenType::PLUS, char))
+          tokens.push(Token.new(TokenType::MULTIPLY, char))
         when '/'
-          @tokens.push(Token.new(TokenType::PLUS, char))
+          tokens.push(Token.new(TokenType::DIVIDE, char))
         when '('
-          @tokens.push(Token.new(TokenType::LPAR, char))
+          tokens.push(Token.new(TokenType::LPAR, char))
         when ')'
-          @tokens.push(Token.new(TokenType::RPAR, char))
+          tokens.push(Token.new(TokenType::RPAR, char))
+        when '^'
+          tokens.push(Token.new(TokenType::POWER, char))
         when /[ \n\t\r]/
         else
           raise ArgumentError.new("Unexpected symbol " + char)
@@ -40,7 +48,7 @@ module PolynomialComputations
         i += 1
       end
 
-      @tokens
+      tokens
     end
   end
 
@@ -59,7 +67,8 @@ module PolynomialComputations
     MINUS = 3
     DIVIDE = 4
     MULTIPLY = 5
-    LPAR = 6
-    RPAR = 7
+    POWER = 6
+    LPAR = 7
+    RPAR = 8
   end
 end

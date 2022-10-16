@@ -3,60 +3,120 @@ module PolynomialComputations
   expression: term ((+|-) term)*
   term: factor ((*|/) factor)*
   factor: ((+|-) factor) | power
-  power: primary (^ primary)*
+  power: primary (^ num)?
   primary: var | num | '(' expression ')'
   var: [a-z]
   num [0-9]+(.[0-9]*)
 =end
 
   class Parser
+    attr_accessor :tokens
     def initialize(tokens)
       @tokens = tokens
-      position = 0
+      @pos = 0
     end
 
     def parse
-      expression
+      expression nil
     end
 
-    def expression
-      node = term
-      op = match [TokenType::PLUS, TokenType::MINUS]
+    def expression(parent)
+      node = term parent
+      op = match_token [TokenType::PLUS, TokenType::MINUS]
       until op.nil?
-        node = BinOpNode.new(op, left: node, right: term)
+        right = term parent
+        new_node = BinOpNode.new(op, left: node, right: right)
+        node.set_parent new_node
+        right.set_parent new_node
+        new_node.set_parent parent
+        node = new_node
+        op = match_token [TokenType::PLUS, TokenType::MINUS]
       end
 
       node
     end
 
-    def term
-      node = factor
-      op = match [TokenType::MULTIPLY, TokenType::DIVIDE]
+    def term(parent)
+      node = factor parent
+      op = match_token [TokenType::MULTIPLY, TokenType::DIVIDE]
       until op.nil?
-        node = BinOpNode.new(op, left: node, right: factor)
+        right = factor parent
+        new_node = BinOpNode.new(op, left: node, right: right)
+        node.set_parent new_node
+        right.set_parent new_node
+        new_node.set_parent parent
+        node = new_node
+        op = match_token [TokenType::MULTIPLY, TokenType::DIVIDE]
       end
 
       node
     end
 
-    def factor
-      unary = match [TokenType::MINUS, TokenType::PLUS]
+    def factor(parent)
+      unary = match_token [TokenType::MINUS, TokenType::PLUS]
       unless unary.nil?
-        return UnOpNode.new(unary, factor)
+        inner = factor parent
+        new_node = UnOpNode.new(unary, inner)
+        inner.set_parent new_node
+        return new_node
       end
 
-      power
+      power parent
     end
 
-    def power
+    def power(parent)
+      base = primary parent
+      exp_token = match_token [TokenType::POWER]
+      unless exp_token.nil?
+        num_token = match_token [TokenType::NUMBER]
+        unless num_token.nil?
+          raise StandardError.new "Unexpected token"
+        end
 
+        right = NumberNode.new(num_token)
+        new_node = BinOpNode.new(exp_token, left: base, right: right)
+        base.set_parent new_node
+        right.set_parent new_node
+        new_node.set_parent parent
+        base = new_node
+      end
+
+      base
     end
 
-    def match(types)
+    def primary(parent)
+      token = match_token [TokenType::LPAR, TokenType::VAR, TokenType::NUMBER]
+      if token.nil?
+        raise StandardError.new("Unexpected token " + @tokens[@pos].value)
+      end
+
+      if token.type == TokenType::LPAR
+        node = expression parent
+        if match_token([TokenType::RPAR]).nil?
+          raise StandardError.new("Expected ) at the end of the expression")
+        end
+
+        node
+      elsif token.type == TokenType::VAR
+        node = VarNode.new(token)
+        node.set_parent parent
+        node
+      elsif token.type == TokenType::NUMBER
+        node = NumberNode.new(token)
+        node.set_parent parent
+        node
+      end
+    end
+
+    def match_token(types)
+      if @pos >= @tokens.size
+        return nil
+      end
+
       types.each do |type|
-        if @tokens[pos].type == type
-          pos += 1
-          return @tokens[pos - 1]
+        if @tokens[@pos].type == type
+          @pos += 1
+          return @tokens[@pos - 1]
         end
       end
 
@@ -65,10 +125,15 @@ module PolynomialComputations
   end
 
   class Node
-    attr_accessor :token, :value
+    attr_accessor :token, :value, :parent
     def initialize(token)
       @token = token
       @value = token.value
+      @parent = nil
+    end
+
+    def set_parent(parent)
+      @parent = parent
     end
   end
 
@@ -80,6 +145,10 @@ module PolynomialComputations
       @left = left
       @right = right
     end
+
+    def accept(visitor)
+      visitor.visit_bin_op_node self
+    end
   end
 
   class UnOpNode < Node
@@ -88,6 +157,36 @@ module PolynomialComputations
     def initialize(token, operand)
       super token
       @operand = operand
+    end
+
+    def accept(visitor)
+      visitor.visit_un_op_node self
+    end
+  end
+
+  class VarNode < Node
+    attr_accessor :name
+
+    def initialize(token)
+      super token
+      @name = token.value
+    end
+
+    def accept(visitor)
+      visitor.visit_var_node self
+    end
+  end
+
+  class NumberNode < Node
+    attr_accessor :value
+
+    def initialize(token)
+      super token
+      @value = Float(token.value)
+    end
+
+    def accept(visitor)
+      visitor.visit_number_node self
     end
   end
 end
