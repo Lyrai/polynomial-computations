@@ -10,7 +10,15 @@ module PolynomialComputations
 
     def compose
       if @tree.kind_of? BinOpNode
+        single_term = !([TokenType::PLUS, TokenType::MINUS].include? @tree.token.type)
+        if single_term
+          @terms.push Term.new
+        end
         visit @tree
+        if single_term
+          current_term.order!
+          @polynomial.add! current_term
+        end
       else
         @terms.push Term.new
         visit @tree
