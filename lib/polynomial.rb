@@ -78,6 +78,43 @@ module PolynomialComputations
 
       res
     end
+
+    def calculate(variables)
+      res = 0
+      @terms.each do |term|
+        help_res = 1
+        term.factors.each do |factor|
+          help_res *= factor.coef
+          if factor.base.nil?
+            help_res*=1
+          else
+            unless variables.keys.include?(factor.base)
+              throw StandardError.new('Input data does not contain variable - '+ factor.base)
+            end
+            help_res*=variables[factor.base]**factor.exp
+          end
+        end
+        res+=help_res
+      end
+      res
+    end
+
+    def +(pol)
+      if pol.kind_of?(Float) or pol.kind_of?(Integer)
+        @terms[0] += pol
+        return self
+      end
+      unless pol.kind_of?(Polynomial)
+        throw StandardError
+      end
+      pol.terms.each do |term|
+        finded_term = find_term(term)
+        unless finded_term.nil?
+          term
+        end
+      end
+    end
+
   end
 
   class Term
@@ -181,7 +218,7 @@ module PolynomialComputations
 
     def to_s
       @factors
-        .reject {|factor| factor.exp == 0 && factor.coef == 1 }
+        .reject { |factor| factor.exp == 0 && factor.coef == 1 }
         .map { |factor| factor.to_s }
         .join ""
     end
