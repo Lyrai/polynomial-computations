@@ -56,7 +56,7 @@ module PolynomialComputations
 
     def degree
       if @degree_changed
-        @degree_changed = terms.map { |term| term.degree }.max
+        @degree = terms.map { |term| term.degree }.max
       end
 
       @degree
