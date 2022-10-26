@@ -39,9 +39,9 @@ module PolynomialComputations
         visit node.left
 
         term = @terms.pop
-        if node.token.type == TokenType::MINUS
-          term.add_unordered! Factor.new -1, nil, 0
-        end
+        #if node.token.type == TokenType::MINUS
+        #  term.add_unordered! Factor.new -1, nil, 0
+        #end
         term.order!
         @polynomial.add_unordered! term
 
