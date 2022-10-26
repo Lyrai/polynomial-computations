@@ -100,16 +100,12 @@ module PolynomialComputations
       res
     end
 
-    def elseif(i)
-      # code here
-    end
-
-    def checker
-      # code here
-    end
 
     def valid_poly
-      if @degree > 2
+      if degree == 0 and @terms[0].factors[0].base.nil?
+        throw StandardError.new("Incorrect form of the polynomial")
+      end
+      if degree > 2
         throw StandardError.new("Finding roots for polynomial degree greater than 2 is not supported")
       end
       checker = @terms[0].factors[1].base
@@ -130,22 +126,18 @@ module PolynomialComputations
       if valid_poly
         if degree == 2
           d = @terms[1].coef ** 2 - 4 * @terms[0].coef * @terms[2].coef
+          sqrt_dist = Math.sqrt(d)
+          denom = (2.0 * @terms[0].coef)
           if d > 0
-            x1 = (-1 * @terms[1].coef + Math.sqrt(d)) / (2.0 *@terms[0].coef)
-            x2 = (-1 * @terms[1].coef - Math.sqrt(d)) / (2.0 *@terms[0].coef)
+            x1 = (-@terms[1].coef + sqrt_dist) / denom
+            x2 = (-@terms[1].coef - sqrt_dist) / denom
             puts 'Первый корень - ' + x1.to_s + "\n" + "Второй корень - " + x2.to_s + "\n"
-            return
-          elsif d == 0
-            x = (-1 * @terms[1].coef) / (2.0 *@terms[0].coef)
-            puts 'Корень - ' + x.to_s + "\n"
-            return
           else
             puts "Корней нет"
-            return
           end
         elsif degree == 1
-          x = -1 * @terms[1].coef / @terms[0].coef
-          puts 'Корень - ' + x + "\n"
+          x = -@terms[1].coef / @terms[0].coef
+          puts 'Корень - ' + x.to_s + "\n"
         end
       end
     end
@@ -278,13 +270,14 @@ module PolynomialComputations
 
       if @factors[0].coef < 0
         return (@factors[1..])
-          .map { |factor| factor.to_s }
-          .unshift("-")
-          .join ""
+                 .map { |factor| factor.to_s }
+                 .unshift(@factors[0].to_s[1..])
+                 .unshift("-")
+                 .join ""
       end
 
       (@factors.size == 1 ? @factors : (@factors
-        .reject {|factor| factor.exp == 0 && factor.coef == 1 }))
+                                          .reject { |factor| factor.exp == 0 && factor.coef == 1 }))
         .map { |factor| factor.to_s }
         .join ""
     end
@@ -301,7 +294,7 @@ module PolynomialComputations
 
     def to_s
       if @exp == 0
-        strip_trailing_zero  @coef
+        strip_trailing_zero @coef
       elsif @exp == 1
         @base
       else
