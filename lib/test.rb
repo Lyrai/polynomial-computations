@@ -31,3 +31,5 @@ c = PolynomialComposer.new(tree)
 poly = c.compose
 puts "--------------------------"
 puts "Polynomial: " +  poly.to_s
+
+puts poly.calculate({'x'=> 5,'y'=>4})
