@@ -62,6 +62,20 @@ module PolynomialComputations
       @degree
     end
 
+	def derivative!
+		countedTerms = []
+		terms.each do |x|
+			if !x.to_s.match(/^(\d)+$/)
+			u = Term.new
+			u.add!(Factor.new(x.degree * x.coef,"x",0))
+			u.add!(Factor.new(1,"x",x.degree - 1))
+			countedTerms.append(u)
+			end
+			
+		end
+		@terms = countedTerms
+	end
+	
     def to_s
       if @terms.size == 0
         return "0"
