@@ -5,7 +5,7 @@ module PolynomialComputations
     def initialize(tree)
       @tree = tree
       @terms = []
-      @polynomial = Polynomial.new tree
+      @polynomial = Polynomial.new
     end
 
     def compose

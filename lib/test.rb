@@ -31,5 +31,5 @@ c = PolynomialComposer.new(tree)
 poly = c.compose
 puts "--------------------------"
 puts "Polynomial: " +  poly.to_s
-poly.derivative!()
-puts "Diff: " + poly.to_s
+
+puts "Diff: " + poly.derivative("x").to_s

@@ -2,12 +2,11 @@ module PolynomialComputations
   class Polynomial
     attr_accessor :terms
 
-    def initialize(tree)
+    def initialize()
       @terms = []
       @degree_changed = false
       @terms_changed = false
       @degree = 0
-      @tree = tree
     end
 
     def add_unordered!(term)
@@ -62,18 +61,23 @@ module PolynomialComputations
       @degree
     end
 
-	def derivative!
-		countedTerms = []
+	def derivative(base)
+		p = Polynomial.new 
 		terms.each do |x|
-			if !x.to_s.match(/^(\d)+$/)
-			u = Term.new
-			u.add!(Factor.new(x.degree * x.coef,"x",0))
-			u.add!(Factor.new(1,"x",x.degree - 1))
-			countedTerms.append(u)
-			end
+			term = x.clone
 			
+			unless term.factors.size == 1
+				buff = term.get_factor(base)
+				unless buff == nil
+					term.add!(Factor.new(buff.exp, nil, 0))
+					buff.exp -= 1
+					p.add_unordered!(term)
+				end
+			end
 		end
-		@terms = countedTerms
+		
+		p.order!
+		p
 	end
 	
     def to_s
