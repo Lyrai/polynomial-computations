@@ -71,9 +71,10 @@ module PolynomialComputations
       @terms.each_index do |i|
         term = @terms[i]
         if i > 0
-          res += term.coef > 0 ? " + " : " - "
+          res += term.coef > 0 ? " + " + term.to_s : " - " + term.to_s[1..]
+        else
+          res += term.to_s
         end
-        res += term.to_s
       end
 
       res
@@ -180,8 +181,23 @@ module PolynomialComputations
     end
 
     def to_s
-      @factors
-        .reject {|factor| factor.exp == 0 && factor.coef == 1 }
+      if @empty
+        return ""
+      end
+
+      if @factors.size == 1
+        return @factors[0].to_s
+      end
+
+      if @factors[0].coef < 0
+        return (@factors[1..])
+          .map { |factor| factor.to_s }
+          .unshift("-")
+          .join ""
+      end
+
+      (@factors.size == 1 ? @factors : (@factors
+        .reject {|factor| factor.exp == 0 && factor.coef == 1 }))
         .map { |factor| factor.to_s }
         .join ""
     end
@@ -198,7 +214,7 @@ module PolynomialComputations
 
     def to_s
       if @exp == 0
-        strip_trailing_zero @coef
+        strip_trailing_zero  @coef
       elsif @exp == 1
         @base
       else
