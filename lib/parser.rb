@@ -39,7 +39,7 @@ module PolynomialComputations
     def term(parent)
       node = factor parent
       op = match_token [TokenType::MULTIPLY, TokenType::DIVIDE]
-      until @pos >= @tokens.size || @tokens[@pos].type == TokenType::PLUS || @tokens[@pos].type == TokenType::PLUS
+      until @pos >= @tokens.size || [TokenType::PLUS, TokenType::MINUS, TokenType::RPAR].include?(@tokens[@pos].type)
         right = factor parent
         new_node = BinOpNode.new(op.nil? ? Token.new(TokenType::MULTIPLY, '*') : op, left: node, right: right)
         node.set_parent! new_node
