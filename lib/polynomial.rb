@@ -181,8 +181,24 @@ module PolynomialComputations
       end
     end
 
-    def +(pol)
-
+    def +(other)
+      result = self.clone
+      if other.kind_of?(Float) or other.kind_of?(Integer)
+        t  = Term.new()
+        t.add!(Factor.new(other,nil,0))
+        result.add!(t)
+        return result
+      end
+      if other.kind_of?(Polynomial)
+        other.terms.each do |term|
+          result.add_unordered!(term)
+        end
+        result.order!
+        return result
+      end
+      if other.kind_of?(String)
+        return result+Polynomial.from_s(other)
+      end
     end
 
   end
