@@ -1,7 +1,7 @@
 module PolynomialComputations
 =begin
   expression: term ((+|-) term)*
-  term: factor ((*|/) factor)*
+  term: factor (factor)*
   factor: (- factor) | power
   power: primary (^ num)?
   primary: var | num | '(' expression ')'
@@ -39,9 +39,9 @@ module PolynomialComputations
     def term(parent)
       node = factor parent
       op = match_token [TokenType::MULTIPLY, TokenType::DIVIDE]
-      until op.nil?
+      until @pos >= @tokens.size || @tokens[@pos].type == TokenType::PLUS || @tokens[@pos].type == TokenType::PLUS
         right = factor parent
-        new_node = BinOpNode.new(op, left: node, right: right)
+        new_node = BinOpNode.new(op.nil? ? Token.new(TokenType::MULTIPLY, '*') : op, left: node, right: right)
         node.set_parent! new_node
         right.set_parent! new_node
         new_node.set_parent! parent
