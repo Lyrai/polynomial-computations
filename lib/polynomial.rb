@@ -82,25 +82,25 @@ module PolynomialComputations
       @degree
     end
 
-	def derivative(base)
-		p = Polynomial.new 
-		terms.each do |x|
-			term = x.clone
-			
-			unless term.factors.size == 1
-				buff = term.get_factor(base)
-				unless buff == nil
-					term.add!(Factor.new(buff.exp, nil, 0))
-					buff.exp -= 1
-					p.add_unordered!(term)
-				end
-			end
-		end
-		
-		p.order!
-		p
-	end
-	
+    def derivative(base)
+      p = Polynomial.new
+      terms.each do |x|
+        term = x.clone
+
+        unless term.factors.size == 1
+          buff = term.get_factor(base)
+          unless buff == nil
+            term.add!(Factor.new(buff.exp, nil, 0))
+            buff.exp -= 1
+            p.add_unordered!(term)
+          end
+        end
+      end
+
+      p.order!
+      p
+    end
+
     def to_s
       if @terms.size == 0
         return "0"
@@ -138,7 +138,6 @@ module PolynomialComputations
       end
       res
     end
-
 
     def valid_poly
       if degree == 0 and @terms[0].factors[0].base.nil?
@@ -181,11 +180,20 @@ module PolynomialComputations
       end
     end
 
+    def clone
+      poly = Polynomial.new
+      @terms.each do |term|
+        poly.add_unordered!(term.clone)
+      end
+      poly.order!
+      poly
+    end
+
     def +(other)
       result = self.clone
       if other.kind_of?(Float) or other.kind_of?(Integer)
-        t  = Term.new()
-        t.add!(Factor.new(other,nil,0))
+        t = Term.new
+        t.add!(Factor.new(other, nil, 0))
         result.add!(t)
         return result
       end
@@ -197,10 +205,27 @@ module PolynomialComputations
         return result
       end
       if other.kind_of?(String)
-        return result+Polynomial.from_s(other)
+        result + Polynomial.from_s(other)
       end
     end
 
+    def -(other)
+      result = self.clone
+      result + -1 * other
+    end
+
+    def *(other)
+      result = self.clone
+      if other.kind_of?(Float) or other.kind_of?(Integer)
+        f = Factor.new(other, nil, 0)
+        result.terms.each do |term|
+          term.add!(f)
+        end
+      end
+      if other.kind_of?(Polynomial) or other.kind_of?(String)
+        return Polynomial.from_s("(" + result.to_s + ")"+"(" + other.to_s + ")")
+      end
+    end
   end
 
   class Term
@@ -325,6 +350,16 @@ module PolynomialComputations
         .map { |factor| factor.to_s }
         .join ""
     end
+
+    def clone
+      t = Term.new
+      factors.each do |factor|
+        t.add_unordered!(factor.clone)
+      end
+      t.order!
+      t
+    end
+
   end
 
   class Factor
