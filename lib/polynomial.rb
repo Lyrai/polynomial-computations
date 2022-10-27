@@ -288,14 +288,15 @@ module PolynomialComputations
 
       if @factors[0].coef < 0
         return (@factors[1..])
+                 .reject { |factor| factor.exp == 0 }
                  .map { |factor| factor.to_s }
                  .unshift(@factors[0].to_s[1..])
                  .unshift("-")
                  .join ""
       end
 
-      (@factors.size == 1 ? @factors : (@factors
-                                          .reject { |factor| factor.exp == 0 && factor.coef == 1 }))
+      @factors
+        .reject { |factor| factor.exp == 0 }
         .map { |factor| factor.to_s }
         .join ""
     end
