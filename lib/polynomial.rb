@@ -105,17 +105,59 @@ module PolynomialComputations
         term.factors.each do |factor|
           help_res *= factor.coef
           if factor.base.nil?
-            help_res*=1
+            help_res *= 1
           else
             unless variables.keys.include?(factor.base)
-              throw StandardError.new('Input data does not contain variable - '+ factor.base)
+              throw StandardError.new('Input data does not contain variable - ' + factor.base)
             end
-            help_res*=variables[factor.base]**factor.exp
+            help_res *= variables[factor.base] ** factor.exp
           end
         end
-        res+=help_res
+        res += help_res
       end
       res
+    end
+
+
+    def valid_poly
+      if degree == 0 and @terms[0].factors[0].base.nil?
+        throw StandardError.new("Incorrect form of the polynomial")
+      end
+      if degree > 2
+        throw StandardError.new("Finding roots for polynomial degree greater than 2 is not supported")
+      end
+      checker = @terms[0].factors[1].base
+      @terms.each do |term|
+        if term.factors.size > 2
+          throw StandardError.new("Incorrect form of the polynomial")
+        end
+        if term.factors.size == 1
+          return true
+        elsif term.factors.size == 2 and term.factors[1].base != checker
+          throw StandardError.new("Incorrect form of the polynomial")
+        end
+      end
+      true
+    end
+
+    def roots
+      if valid_poly
+        if degree == 2
+          d = @terms[1].coef ** 2 - 4 * @terms[0].coef * @terms[2].coef
+          sqrt_dist = Math.sqrt(d)
+          denom = (2.0 * @terms[0].coef)
+          if d > 0
+            x1 = (-@terms[1].coef + sqrt_dist) / denom
+            x2 = (-@terms[1].coef - sqrt_dist) / denom
+            puts 'Первый корень - ' + x1.to_s + "\n" + "Второй корень - " + x2.to_s + "\n"
+          else
+            puts "Корней нет"
+          end
+        elsif degree == 1
+          x = -@terms[1].coef / @terms[0].coef
+          puts 'Корень - ' + x.to_s + "\n"
+        end
+      end
     end
 
     def +(pol)
@@ -246,13 +288,14 @@ module PolynomialComputations
 
       if @factors[0].coef < 0
         return (@factors[1..])
-          .map { |factor| factor.to_s }
-          .unshift("-")
-          .join ""
+                 .map { |factor| factor.to_s }
+                 .unshift(@factors[0].to_s[1..])
+                 .unshift("-")
+                 .join ""
       end
 
       (@factors.size == 1 ? @factors : (@factors
-        .reject {|factor| factor.exp == 0 && factor.coef == 1 }))
+                                          .reject { |factor| factor.exp == 0 && factor.coef == 1 }))
         .map { |factor| factor.to_s }
         .join ""
     end
@@ -269,7 +312,7 @@ module PolynomialComputations
 
     def to_s
       if @exp == 0
-        strip_trailing_zero  @coef
+        strip_trailing_zero @coef
       elsif @exp == 1
         @base
       else
