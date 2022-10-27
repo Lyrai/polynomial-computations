@@ -32,5 +32,5 @@ poly = c.compose
 puts "--------------------------"
 puts "Polynomial: " +  poly.to_s
 
-
+puts "Diff: " + poly.derivative("x").to_s
 poly.roots
