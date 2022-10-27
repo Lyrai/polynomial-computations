@@ -170,31 +170,19 @@ module PolynomialComputations
           if d > 0
             x1 = (-@terms[1].coef + sqrt_dist) / denom
             x2 = (-@terms[1].coef - sqrt_dist) / denom
-            puts 'Первый корень - ' + x1.to_s + "\n" + "Второй корень - " + x2.to_s + "\n"
+            puts 'First root - ' + x1.to_s + "\n" + "Second root - " + x2.to_s + "\n"
           else
-            puts "Корней нет"
+            puts "No roots"
           end
         elsif degree == 1
           x = -@terms[1].coef / @terms[0].coef
-          puts 'Корень - ' + x.to_s + "\n"
+          puts 'Root - ' + x.to_s + "\n"
         end
       end
     end
 
     def +(pol)
-      if pol.kind_of?(Float) or pol.kind_of?(Integer)
-        @terms[0] += pol
-        return self
-      end
-      unless pol.kind_of?(Polynomial)
-        throw StandardError
-      end
-      pol.terms.each do |term|
-        finded_term = find_term(term)
-        unless finded_term.nil?
-          term
-        end
-      end
+
     end
 
   end
