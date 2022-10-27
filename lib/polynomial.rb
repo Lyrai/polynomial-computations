@@ -1,12 +1,33 @@
+require_relative 'lexer'
+require_relative 'parser'
+require_relative 'constant_folder'
+require_relative 'power_expander'
+require_relative 'simplifier'
+require_relative 'polynomial_composer'
+
 module PolynomialComputations
   class Polynomial
     attr_accessor :terms
 
-    def initialize()
+    def initialize
       @terms = []
       @degree_changed = false
       @terms_changed = false
       @degree = 0
+    end
+
+    def self.from_s(str)
+      l = Lexer.new str
+      p = Parser.new l.tokens
+      tree = p.parse
+      f = ConstantFolder.new tree
+      tree = f.fold
+      e = PowerExpander.new tree
+      tree = e.expand
+      s = Simplifier.new tree
+      tree = s.simplify
+      c = PolynomialComposer.new tree
+      c.compose
     end
 
     def add_unordered!(term)
@@ -296,7 +317,7 @@ module PolynomialComputations
       end
 
       @factors
-        .reject { |factor| factor.exp == 0 }
+        .reject { |factor| factor.exp == 0 && factor.base != nil }
         .map { |factor| factor.to_s }
         .join ""
     end
