@@ -316,10 +316,12 @@ module PolynomialComputations
                  .join ""
       end
 
-      @factors
+      res = @factors
         .reject { |factor| factor.exp == 0 && factor.base != nil }
         .map { |factor| factor.to_s }
         .join ""
+
+      res.match?(/1\D/) ? res[1..] : res
     end
   end
 

@@ -6,6 +6,7 @@ module PolynomialComputations
       @tree = tree
       @terms = []
       @polynomial = Polynomial.new
+      tree.print
     end
 
     def compose
@@ -67,8 +68,8 @@ module PolynomialComputations
           raise StandardError.new "Only numbers and single variables are supported in denominator"
         end
       elsif node.token.type == TokenType::POWER
-        visit node.left
-        last_factor.exp = node.right.value
+        factor = Factor.new 1, node.left.token.value, node.right.token.value
+        current_term.add_unordered! factor
       end
     end
 

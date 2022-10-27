@@ -11,7 +11,10 @@ module PolynomialComputations
     end
 
     def visit_bin_op_node(node)
-      if node.token.type == TokenType::MULTIPLY || node.token.type == TokenType::DIVIDE
+      visit node.left
+      visit node.right
+
+      if node.token.type == TokenType::MULTIPLY
         left_token = node.left.token
         old_token = node.token
         if left_token.type == TokenType::PLUS || left_token.type == TokenType::MINUS
@@ -29,13 +32,8 @@ module PolynomialComputations
           left.right.set_parent! left
           left.set_parent! node
           node.left = left
-        end
-      end
-
-      if node.token.type == TokenType::MULTIPLY
-        right_token = node.right.token
-        old_token = node.token
-        if right_token.type == TokenType::PLUS || right_token.type == TokenType::MINUS
+        elsif node.right.token.type == TokenType::PLUS || node.right.token.type == TokenType::MINUS
+          right_token = node.right.token
           node.set_token! right_token
           old_left = node.left
           left = BinOpNode.new(old_token, left: old_left.clone, right: node.right.left)
