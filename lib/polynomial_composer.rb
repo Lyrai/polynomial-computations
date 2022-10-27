@@ -6,7 +6,6 @@ module PolynomialComputations
       @tree = tree
       @terms = []
       @polynomial = Polynomial.new
-      tree.print
     end
 
     def compose

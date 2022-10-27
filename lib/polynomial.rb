@@ -116,7 +116,7 @@ module PolynomialComputations
         end
       end
 
-      res
+      res.empty? ? "0" : "\"" + res + "\""
     end
 
     def calculate(variables)
@@ -211,7 +211,7 @@ module PolynomialComputations
 
     def -(other)
       result = self.clone
-      result + -1 * other
+      result + other * -1
     end
 
     def *(other)
@@ -221,9 +221,10 @@ module PolynomialComputations
         result.terms.each do |term|
           term.add!(f)
         end
+        return result
       end
       if other.kind_of?(Polynomial) or other.kind_of?(String)
-        return Polynomial.from_s("(" + result.to_s + ")"+"(" + other.to_s + ")")
+        Polynomial.from_s("(" + result.to_s + ")"+"(" + other.to_s + ")")
       end
     end
   end
