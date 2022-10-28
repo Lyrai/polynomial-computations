@@ -101,6 +101,28 @@ module PolynomialComputations
       p
     end
 
+    def integrate(base)
+      p = Polynomial.new
+      terms.each do |x|
+        term = x.clone
+
+        if !(term.factors.size == 1)
+          buff = term.get_factor(base)
+          unless buff == nil
+            term.add!(Factor.new((buff.exp + 1) ** -1, nil, 0))
+            buff.exp += 1
+            p.add_unordered!(term)
+          end
+        else
+          term.add!(Factor.new(1,base,1))
+          p.add_unordered!(term)
+        end
+      end
+
+      p.order!
+      p
+    end
+
     def to_s
       if @terms.size == 0
         return "0"
@@ -224,7 +246,7 @@ module PolynomialComputations
         return result
       end
       if other.kind_of?(Polynomial) or other.kind_of?(String)
-        Polynomial.from_s("(" + result.to_s + ")"+"(" + other.to_s + ")")
+        Polynomial.from_s("(" + result.to_s + ")" + "(" + other.to_s + ")")
       end
     end
   end
@@ -347,11 +369,11 @@ module PolynomialComputations
       end
 
       res = @factors
-        .reject { |factor| factor.exp == 0 && factor.base != nil }
-        .map { |factor| factor.to_s }
-        .join ""
+              .reject { |factor| factor.exp == 0 && factor.base != nil }
+              .map { |factor| factor.to_s }
+              .join ""
 
-      res.match?(/1\D/) ? res[1..] : res
+      res.match?(/1[^\d.]/) ? res[1..] : res
     end
 
     def clone

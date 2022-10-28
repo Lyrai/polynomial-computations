@@ -32,6 +32,7 @@ Here you can see list of functions/operations that are available
 
     Use 'Polynomial.calculate(variables)' to calculate polynomial by array of variables
     Use 'Polynomial.derivative(base)' to differentiate equation by varibable base
+    Use 'Polynomial.integrate(base)' to integrate equation by varibable base
     Use 'Polynomial.roots' to find the roots of a polynomial
     Use 'Polynomial.from_s' to get polynomial from string
     Use 'Polynomial.+(Other_Polynomial)' or 'Polynomial + Other_Polynomial' for polynomial addition
