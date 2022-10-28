@@ -1,8 +1,9 @@
 # PolynomialComputations
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/polynomial_computations`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Gem that handles simple mathematical operations, such as: 
+--Finding roots
+--Derivative calculation
+--Calculation of polynomials of degree 2 or less
 
 ## Installation
 
@@ -16,7 +17,11 @@ If bundler is not being used to manage dependencies, install the gem by executin
 
 ## Usage
 
-TODO: Write usage instructions here
+
+    Use 'Polynomial.calculate(variables)' to calculate polynomial by array of variables
+    Use 'Polynomial.derivative(base)' to differentiate equation by varibable base
+    Use 'Polynomial.roots' to find the roots of a polynomial
+    Use 'Polynomial.from_s' to get polynomial from string
 
 ## Development
 
