@@ -17,7 +17,18 @@ If bundler is not being used to manage dependencies, install the gem by executin
     $ gem install polynomial_computations
 
 ## Usage
+To use this gem, you need to paste following code to your source file
 
+
+    require_relative 'lexer'
+    require_relative 'parser'
+    require_relative 'simplifier'
+    require_relative 'constant_folder'
+    require_relative 'power_expander'
+    require_relative 'polynomial_composer'
+    include PolynomialComputations
+
+Here you can see list of functions/operations that are available
 
     Use 'Polynomial.calculate(variables)' to calculate polynomial by array of variables
     Use 'Polynomial.derivative(base)' to differentiate equation by varibable base
