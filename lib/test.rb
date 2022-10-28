@@ -12,5 +12,5 @@ poly = Polynomial.from_s(expr)
 expr1 = gets.chomp
 poly1 = Polynomial.from_s(expr1)
 puts "Polynomial1: " + poly.to_s + " Polynomial2: " + poly1.to_s
-d = poly - poly1
+d = poly.+(poly1)
 puts "Polynomial: " + d.to_s

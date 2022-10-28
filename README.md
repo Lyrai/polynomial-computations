@@ -4,6 +4,7 @@ Gem that handles simple mathematical operations, such as:
 --Finding roots
 --Derivative calculation
 --Calculation of polynomials of degree 2 or less
+--Operations + - * for polynomials
 
 ## Installation
 
@@ -22,7 +23,11 @@ If bundler is not being used to manage dependencies, install the gem by executin
     Use 'Polynomial.derivative(base)' to differentiate equation by varibable base
     Use 'Polynomial.roots' to find the roots of a polynomial
     Use 'Polynomial.from_s' to get polynomial from string
-
+    Use 'Polynomial.+(Other_Polynomial)' or 'Polynomial + Other_Polynomial' for polynomial addition
+    Use 'Polynomial.-(Other_Polynomial)' or 'Polynomial - Other_Polynomial' for polynomial substruction
+    Use 'Polynomial.*(Other_Polynomial)' or 'Polynomial * Other_Polynomial' for polynomial multiplication
+    Use 'Polynomial.to_s' to convert polynimal to string
+    
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
